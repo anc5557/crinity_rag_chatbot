@@ -21,7 +21,10 @@ def create_faiss_index(json_path, output_path="db/"):
 
     documents = combine_title_description(data)
 
-    embedding_model = HuggingFaceEmbeddings(model_name="jhgan/ko-sroberta-multitask")
+    embedding_model = HuggingFaceEmbeddings(
+        model_name="jhgan/ko-sroberta-multitask",
+        encode_kwargs={"normalize_embeddings": True},
+    )
     texts = [doc["title"] + " " + doc["description"] for doc in documents]
     document_objects = [Document(page_content=text) for text in texts]
 
