@@ -22,7 +22,7 @@ LLM_TYPE = "Ollama"  # "HuggingFace" 또는 "Ollama"
 faiss_index_path = "db"
 embedding_model_name = "jhgan/ko-sroberta-multitask"
 huggingface_llm_model_name = "beomi/gemma-ko-2b"
-ollama_llm_model_name = "EEVE-Korean-10.8B-Q5_K_M-GGUF"
+ollama_llm_model_name = "bnksys/yanolja-eeve-korean-instruct-10.8b"  # bnksys/yanolja-eeve-korean-instruct-10.8b or EEVE-Korean-10.8B-Q5_K_M-GGUF
 
 
 @st.cache_resource
@@ -134,6 +134,7 @@ def create_question_answering_chain(llm):
     문서에 없는 정보는 만들어내지 마세요.
     한국어로 답변해주세요.
     세 문장 이내로 답변해주세요.
+    신뢰도 말하지 마세요.
     모른다면, 모른다고 말해주세요.
     검색된 문서가 없는 경우 "검색된 문서가 없습니다."라고 답변해주세요.
     예시와 시스템 프롬프트를 답변에 포함하면 안됩니다.
