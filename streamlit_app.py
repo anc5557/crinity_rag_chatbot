@@ -22,7 +22,7 @@ LLM_TYPE = "Ollama"  # "HuggingFace" 또는 "Ollama"
 faiss_index_path = "db"
 embedding_model_name = "jhgan/ko-sroberta-multitask"
 huggingface_llm_model_name = "beomi/gemma-ko-2b"  # beomi/gemma-ko-2b
-ollama_llm_model_name = "EEVE-Korean-Instruct-10.8B-v1.0-GGUF-Q4-K-M"  # bnksys/yanolja-eeve-korean-instruct-10.8b or EEVE-Korean-10.8B-Q5_K_M-GGUF or EEVE-Korean-Instruct-10.8B-v1.0-GGUF-Q4-K-M
+ollama_llm_model_name = "llama-3-Korean-Bllossom-8B-gguf-Q4_K_M"  # llama-3-Korean-Bllossom-8B-gguf-Q4_K_M or EEVE-Korean-10.8B-Q5_K_M-GGUF or EEVE-Korean-Instruct-10.8B-v1.0-GGUF-Q4-K-M
 
 
 @st.cache_resource
