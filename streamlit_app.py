@@ -1,6 +1,9 @@
+import os
 import time
 import streamlit as st
 import logging
+from dotenv import load_dotenv
+from input_gspread import input_faq
 from langchain_community.vectorstores import FAISS
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain.chains import create_history_aware_retriever, create_retrieval_chain
@@ -15,9 +18,19 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 # 로깅 설정
 logging.basicConfig(level=logging.INFO)
 
+# .env 파일 로드
+load_dotenv()
 
-# LLM 타입 설정
+# 환경 변수에서 LLM 타입 및 Ollama URL 설정
+ENV = os.getenv("ENV", "dev")
+
 LLM_TYPE = "Ollama"  # "HuggingFace" 또는 "Ollama"
+
+# Ollama URL 설정
+if ENV == "dev":
+    OLLAMA_BASE_URL = "http://localhost:11434"
+elif ENV == "prod":
+    OLLAMA_BASE_URL = "http://ollama:11434"
 
 faiss_index_path = "db"
 embedding_model_name = "jhgan/ko-sroberta-multitask"
@@ -27,6 +40,7 @@ ollama_llm_model_name = "EEVE-Korean-Instruct-10.8B-v1.0-GGUF-Q4-K-M"  # llama-3
 
 @st.cache_resource
 def load_embedding_model(model_name):
+    """임베딩 모델 로드"""
     embedding_model = HuggingFaceEmbeddings(
         model_name=model_name, encode_kwargs={"normalize_embeddings": True}
     )
@@ -35,6 +49,7 @@ def load_embedding_model(model_name):
 
 @st.cache_resource
 def load_vectorstore(index_path, _embedding_model):
+    """벡터스토어 로드"""
     vectorstore = FAISS.load_local(
         folder_path=index_path,
         embeddings=_embedding_model,
@@ -45,6 +60,9 @@ def load_vectorstore(index_path, _embedding_model):
 
 @st.cache_resource
 def load_llm(llm_model_name, llm_type):
+    """LLM 로드
+    llm_type: HuggingFace 또는 Ollama
+    """
     if llm_type == "HuggingFace":
         llm = HuggingFacePipeline.from_model_id(
             model_id=llm_model_name,
@@ -57,12 +75,14 @@ def load_llm(llm_model_name, llm_type):
             },
         )
     elif llm_type == "Ollama":
-        llm = Ollama(model=llm_model_name)
+        llm = Ollama(model=llm_model_name, base_url=OLLAMA_BASE_URL)
     return llm
 
 
 @st.cache_resource
 def create_rag_chain(embedding_model_name, faiss_index_path, llm_model_name, llm_type):
+    """RAG 체인 생성"""
+
     logging.info("서버 시작합니다.")
     embedding_model = load_embedding_model(embedding_model_name)
     logging.info("임베딩 모델 로드 완료")
@@ -86,6 +106,8 @@ def create_rag_chain(embedding_model_name, faiss_index_path, llm_model_name, llm
 
 
 def create_question_rephrasing_chain(llm, retriever):
+    """질문 재구성 체인 생성"""
+
     system_prompt = """
     당신은 질문 재구성자입니다. 이전 대화 내용과 최신 사용자 질문이 있을 때, 이 질문이 이전 대화 내용과 관련이 있을 수 있습니다.
     관련이 있는 경우, 이전 대화 내용을 참고하여 사용자의 최신 질문을 재구성하세요. 
@@ -143,6 +165,8 @@ def create_question_rephrasing_chain(llm, retriever):
 
 
 def create_question_answering_chain(llm):
+    """질문 답변 체인 생성"""
+
     system_prompt = """당신은 크리니티 Q&A 챗봇입니다. 검색된 문서를 기반으로 사용자의 질문에 답변하세요. 문서에 없는 정보는 만들어내지 마세요. 한국어로 답변해주세요. 세 문장 이내로 답변해주세요.모른다면, 모른다고 말해주세요. 검색된 문서가 없는 경우 "검색된 문서가 없습니다."라고 답변해주세요.
     ## 검색된 문서 ##
     {context}
@@ -161,6 +185,7 @@ def create_question_answering_chain(llm):
 
 
 def clean_data(data):
+    """데이터 정제"""
     cleaned_data = []
     for item in data:
         cleaned_page_content = item.page_content.replace("\n", " ").strip()
@@ -173,7 +198,10 @@ def reset_chat():
 
 
 def main():
-    st.title("크리니티 Q&A 챗봇")
+    st.title("💭크리니티 Q&A 챗봇")
+
+    with st.expander("알림", icon="📢", expanded=True):
+        """사내 테스트 중입니다. 문서는 cm9.3 사용자 메뉴얼입니다. \n\n 문서 개선 작업중으로 내용이 부족하거나 부정확할 수 있습니다. \n\n 답변이 만족스럽지 않다면, [여기](https://docs.google.com/spreadsheets/d/1iu9H_OZPtnvGGXM07axeCWz8sH5eSSOpi84nrzMX5B0/edit?pli=1&gid=0#gid=0)를 클릭하여 '상이함'에 체크해주세요."""
 
     if LLM_TYPE == "HuggingFace":
         llm_model_name = huggingface_llm_model_name
@@ -190,20 +218,23 @@ def main():
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
-    #
+    # 대화 초기화 버튼
     if st.button("대화 초기화"):
         reset_chat()
         st.toast("초기화 되었습니다.", icon="❌")
 
     with st.chat_message("assistant"):
-        st.markdown("안녕하세요! 크리니티 Q&A 챗봇입니다. 질문을 입력해주세요. 🤖")
+        st.markdown(
+            "안녕하세요! 크리니티 Q&A 챗봇입니다. 질문을 입력해주세요. 🤖 \n\n "
+        )
+        st.markdown("")
 
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
     if prompt := st.chat_input("Ask a question!"):
-        MAX_MESSAGES_BEFORE_DELETION = 4
+        MAX_MESSAGES_BEFORE_DELETION = 4  # 최대 메세지 수
 
         if len(st.session_state.messages) >= MAX_MESSAGES_BEFORE_DELETION:
             del st.session_state.messages[:2]
@@ -225,9 +256,9 @@ def main():
 
                 cleaned_datas = clean_data(result["context"])
 
-                for cleaned_data in cleaned_datas:
-                    with st.expander("Evidence context"):
-                        st.write(f"Page content: {cleaned_data['page_content']}")
+                for i, cleaned_data in enumerate(cleaned_datas):
+                    with st.expander(f"참고 문서 {i+1}"):
+                        st.write(cleaned_data["page_content"])
 
                 for chunk in result["answer"].split(" "):
                     full_response += chunk + " "
@@ -238,6 +269,10 @@ def main():
             st.session_state.messages.append(
                 {"role": "assistant", "content": full_response}
             )
+
+            # 질문과 답변을 스프레드시트에 기록
+            if ENV == "prod":
+                input_faq(prompt, full_response.strip())
 
 
 main()
