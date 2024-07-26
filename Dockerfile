@@ -14,8 +14,7 @@ RUN /app/venv/bin/pip install --upgrade pip && \
 
 # 환경 변수 설정
 ENV PATH="/app/venv/bin:$PATH"
-ENV LLM_TYPE="Ollama"
-ENV OLLAMA_BASE_URL="http://ollama:11434"
+ENV ENV="prod"
 
 # Streamlit 애플리케이션 코드 복사
 COPY streamlit_app.py .
