@@ -13,14 +13,14 @@ ollama 모델을 사용하였습니다.
 
 ## Requirements
 
-streamlit==1.36.0
-langchain==0.2.11
-langchain-community==0.2.10
-langchain_huggingface==0.0.3
-torch==2.4.0
-faiss-gpu
-python-dotenv
-gspread
+streamlit==1.36.0  
+langchain==0.2.11  
+langchain-community==0.2.10  
+langchain_huggingface==0.0.3  
+torch==2.4.0  
+faiss-gpu  
+python-dotenv  
+gspread  
 
 ## create_faiss_index.py
 
