@@ -30,6 +30,10 @@ gspread
   - python create_faiss_index.py --json_path [JSON 파일 경로] --output_path [FAISS 인덱스 저장 경로]
   - output_path의 기본값은 db/ 입니다. 기본값을 사용하는 것을 권장합니다.
 
+## cuda_check.py
+
+cuda가 사용 가능한지 확인하는 코드입니다.
+
 ## streamlit_app.py
 
 streamlit을 사용하여 챗봇을 실행하는 코드입니다.  
