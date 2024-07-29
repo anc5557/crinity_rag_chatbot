@@ -12,6 +12,8 @@ from langchain_community.llms.huggingface_pipeline import HuggingFacePipeline
 from langchain_core.prompts import (
     ChatPromptTemplate,
     MessagesPlaceholder,
+    PromptTemplate,
+    FewShotPromptTemplate,
 )
 from langchain.chains.combine_documents import create_stuff_documents_chain
 
@@ -112,33 +114,77 @@ def create_question_rephrasing_chain(llm, retriever):
     이런 경우, 대화 내용을 알 필요 없이 독립적으로 이해할 수 있는 질문으로 바꾸세요.
     질문에 답할 필요는 없고, 필요하다면 그저 다시 구성하거나 그대로 두세요.
     
-    재구성된 질문만 응답하세요. 추가적인 텍스트는 포함하지 마세요.
+    재구성된 질문만 답변하세요.
     """
 
-    prompt = ChatPromptTemplate.from_messages(
-        [
-            ("system", system_prompt),
-            MessagesPlaceholder(variable_name="chat_history"),
-            ("human", "{input}"),
-        ]
+    # examples : few-shot learning examples
+    examples = [
+        {
+            "chat_history": "Human: 메일 첨부파일 크기 제한이 있나요?\nAI: 일반 첨부파일의 경우 20MB, 대용량 파일 첨부의 경우 2GB까지 가능합니다.",
+            "input": "형식에 제한이 있나요?",
+            "rephrased": "메일 첨부파일 형식 제한이 있나요?",
+        },
+        {
+            "chat_history": "Human: 일정 등록하는 방법을 알려줘\nAI: 일정 등록 버튼을 누르거나 날짜를 선택해 등록할 수 있습니다. 제목과 일시를 정한 후, 캘린더의 종류를 선택하고, 알람을 통해 미리 일정을 알릴 수 있습니다.",
+            "input": "수정하는 방법은?",
+            "rephrased": "일정 수정하는 방법은?",
+        },
+        {
+            "chat_history": "Human: 주소록에 주소를 이동/복사하려면 어떻게 하나요?\nAI: 주소록에 주소를 이동/복사하려면, 주소록에서 주소를 선택한 후, 이동 또는 복사 버튼을 누르세요. 이동할 주소록을 선택하거나, 새로운 주소록을 만들어 이동할 수 있습니다.",
+            "input": "복사하면 붙여넣기는 어떻게 하나요?",
+            "rephrased": "주소록에 복사한 주소를 붙여넣는 방법은 무엇인가요?",
+        },
+        {
+            "chat_history": "Human: 안녕\nAI: 안녕하세요! 무엇을 도와드릴까요?",
+            "input": "메일 첨부파일 크기 제한이 있나요?",
+            "rephrased": "메일 첨부파일 크기 제한이 있나요?",
+        },
+        {
+            "chat_history": "Human: 일정 등록하는 방법을 알려줘 \nAI: 일정 등록 버튼을 누르거나 날짜를 선택해 등록할 수 있습니다. 제목과 일시를 정한 후, 캘린더의 종류를 선택하고, 알람을 통해 미리 일정을 알릴 수 있습니다.",
+            "input": "메일 백업하는 방법을 알려줘",
+            "rephrased": "메일 백업하는 방법을 알려줘",
+        },
+        {
+            "chat_history": "Human: 메일 검색 기능에 대해 알고 싶어요.\nAI: 검색창에 검색어를 입력하면 전체, 보낸사람, 받는사람, 참조, 제목, 내용, 첨부파일명으로 메일을 검색할 수 있습니다.",
+            "input": "제목으로 검색하는 방법은?",
+            "rephrased": "메일 제목을 기준으로 검색하는 방법을 알려주세요.",
+        },
+    ]
+
+    # MessagesPlaceholder 사용
+    MessagesPlaceholder(variable_name="chat_history")
+
+    # example_prompt
+    example_prompt = PromptTemplate.from_template(
+        "이전 대화 내용:\n{chat_history}\n최신 사용자 질문:\n{input}\n재구성된 질문:\n{rephrased}"
     )
 
-    return create_history_aware_retriever(llm, retriever, prompt)
+    # few-shot prompt
+    few_shot_prompt = FewShotPromptTemplate(
+        examples=examples,
+        example_prompt=example_prompt,
+        prefix=system_prompt,
+        suffix="이전 대화 내용:\n{chat_history}\n최신 사용자 질문:\n{input}\n재구성된 질문:\n",
+        input_variables=["chat_history", "input"],
+    )
+
+    # 체인 생성 및 반환
+    return create_history_aware_retriever(llm, retriever, few_shot_prompt)
 
 
 def create_question_answering_chain(llm):
     """질문 답변 체인 생성"""
 
     system_prompt = """당신은 크리니티 Q&A 챗봇입니다. 검색된 문서를 기반으로 사용자의 질문에 답변하세요. 문서에 없는 정보는 만들어내지 마세요. 한국어로 답변해주세요. 세 문장 이내로 답변해주세요.모른다면, 모른다고 말해주세요. 검색된 문서가 없는 경우 "검색된 문서가 없습니다."라고 답변해주세요.
-    ## 검색된 문서 ##
+    
+    <context>
     {context}
-    ################
+    </context>
     """
 
     prompt = ChatPromptTemplate.from_messages(
         [
             ("system", system_prompt),
-            MessagesPlaceholder(variable_name="chat_history"),
             ("human", "{input}\n"),
         ]
     )
@@ -153,6 +199,17 @@ def clean_data(data):
         cleaned_page_content = item.page_content.replace("\n", " ").strip()
         cleaned_data.append({"page_content": cleaned_page_content})
     return cleaned_data
+
+
+def format_chat_history(messages):
+    """대화 내용을 텍스트 형식으로 변환"""
+    formatted_messages = []
+    for message in messages:
+        if message["role"] == "user":
+            formatted_messages.append(f"Human: {message['content']}")
+        elif message["role"] == "assistant":
+            formatted_messages.append(f"AI: {message['content']}")
+    return "\n".join(formatted_messages)
 
 
 def reset_chat():
@@ -210,8 +267,9 @@ def main():
 
             with st.spinner("답변중입니다..."):
                 rag_chain = st.session_state.rag_chain
+                formatted_chat_history = format_chat_history(st.session_state.messages)
                 result = rag_chain.invoke(
-                    {"input": prompt, "chat_history": st.session_state.messages}
+                    {"input": prompt, "chat_history": formatted_chat_history}
                 )
 
                 st.session_state.messages.append({"role": "user", "content": prompt})
