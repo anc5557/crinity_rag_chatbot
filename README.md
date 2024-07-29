@@ -13,12 +13,14 @@ ollama 모델을 사용하였습니다.
 
 ## Requirements
 
-conda env create -f environment.yml 명령어로 환경을 생성합니다.  
-필요한 경우 environment.yml 파일에 pefix 또는 name을 수정하여 가상 환경 설치 경로와 이름을 변경할 수 있습니다.  
-
-- conda env create -f environment.yml
-- conda env list
-- conda activate [환경 이름: 기본값은 chatbot]
+streamlit==1.36.0
+langchain==0.2.11
+langchain-community==0.2.10
+langchain_huggingface==0.0.3
+torch==2.4.0
+faiss-gpu
+python-dotenv
+gspread
 
 ## create_faiss_index.py
 
@@ -32,3 +34,7 @@ conda env create -f environment.yml 명령어로 환경을 생성합니다.
 
 streamlit을 사용하여 챗봇을 실행하는 코드입니다.  
 streamlit run streamlit_app.py 명령어로 실행합니다.
+
+## .env
+
+메뉴얼 문서와 스프레드 시트 API를 사용하기 위한 환경 변수 파일은 비공개로 관리합니다.
