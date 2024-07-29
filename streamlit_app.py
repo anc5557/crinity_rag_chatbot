@@ -35,7 +35,7 @@ elif ENV == "prod":
 faiss_index_path = "db"
 embedding_model_name = "jhgan/ko-sroberta-multitask"
 huggingface_llm_model_name = "beomi/gemma-ko-2b"  # beomi/gemma-ko-2b
-ollama_llm_model_name = "EEVE-Korean-Instruct-10.8B-v1.0-GGUF-Q4-K-M"  # llama-3-Korean-Bllossom-8B-gguf-Q4_K_M or EEVE-Korean-10.8B-Q5_K_M-GGUF or EEVE-Korean-Instruct-10.8B-v1.0-GGUF-Q4-K-M
+ollama_llm_model_name = "llama3.1:8b-instruct-q4_K_M"  # llama-3-Korean-Bllossom-8B-gguf-Q4_K_M or EEVE-Korean-10.8B-Q5_K_M-GGUF or EEVE-Korean-Instruct-10.8B-v1.0-GGUF-Q4-K-M or llama3.1:8b-instruct-q4_K_M
 
 
 @st.cache_resource
@@ -108,49 +108,11 @@ def create_rag_chain(embedding_model_name, faiss_index_path, llm_model_name, llm
 def create_question_rephrasing_chain(llm, retriever):
     """질문 재구성 체인 생성"""
 
-    system_prompt = """
-    당신은 질문 재구성자입니다. 이전 대화 내용과 최신 사용자 질문이 있을 때, 이 질문이 이전 대화 내용과 관련이 있을 수 있습니다.
-    관련이 있는 경우, 이전 대화 내용을 참고하여 사용자의 최신 질문을 재구성하세요. 
-    관련 없는 경우, 사용자 질문을 그대로 반복해주세요.
+    system_prompt = """이전 대화 내용과 최신 사용자 질문이 있을 때, 이 질문이 이전 대화 내용과 관련이 있을 수 있습니다.
+    이런 경우, 대화 내용을 알 필요 없이 독립적으로 이해할 수 있는 질문으로 바꾸세요.
+    질문에 답할 필요는 없고, 필요하다면 그저 다시 구성하거나 그대로 두세요.
     
-    예시:
-    관련 있는 경우)
-    1.
-    Human: 메일 첨부파일 크기 제한이 있나요?
-    AI: 일반 첨부파일의 경우 20MB, 대용량 파일 첨부의 경우 2GB까지 가능합니다.
-    Human: 형식에 제한이 있나요?
-    답변: 메일 첨부파일 형식 제한이 있나요?
-    
-    2.
-    Human: 일정 등록하는 방법을 알려줘
-    AI: 일정 등록 버튼을 누르거나 날짜를 선택해 등록할 수 있습니다. 제목과 일시를 정한 후, 캘린더의 종류를 선택하고, 알람을 통해 미리 일정을 알릴 수 있습니다.
-    Human: 수정하는 방법은?
-    답변: 일정 수정하는 방법은?
-    
-    3.
-    Human: 주소록에 주소를 이동/복사하려면 어떻게 하나요?
-    AI: 주소록에 주소를 이동/복사하려면, 주소록에서 주소를 선택한 후, 이동 또는 복사 버튼을 누르세요. 이동할 주소록을 선택하거나, 새로운 주소록을 만들어 이동할 수 있습니다.
-    Human: 복사하면 붙여넣기는 어떻게 하나요?
-    답변: 주소록에 복사한 주소를 붙여넣는 방법은 무엇인가요?
-    
-    관련 없는 경우)
-    1.
-    Human: 메일 첨부파일 크기 제한이 있나요?
-    AI: 일반 첨부파일의 경우 20MB, 대용량 파일 첨부의 경우 2GB까지 가능합니다.
-    Human: 주소록에 주소를 이동/복사하려면 어떻게 하나요?
-    답변: 주소록에 주소를 이동/복사하려면 어떻게 하나요?
-    
-    2.
-    Human: 일정 등록하는 방법을 알려줘
-    AI: 일정 등록 버튼을 누르거나 날짜를 선택해 등록할 수 있습니다. 제목과 일시를 정한 후, 캘린더의 종류를 선택하고, 알람을 통해 미리 일정을 알릴 수 있습니다.
-    Human: 메일 첨부파일 크기 제한은?
-    답변: 메일 첨부파일 크기 제한은?
-    
-    3.
-    Human: 안녕
-    AI: 안녕하세요! 무엇을 도와드릴까요?
-    Human: 메일 첨부파일 크기 제한이 있나요?
-    답변: 메일 첨부파일 크기 제한이 있나요?
+    재구성된 질문만 응답하세요. 추가적인 텍스트는 포함하지 마세요.
     """
 
     prompt = ChatPromptTemplate.from_messages(
