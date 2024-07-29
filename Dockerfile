@@ -16,9 +16,9 @@ RUN /app/venv/bin/pip install --upgrade pip && \
 ENV PATH="/app/venv/bin:$PATH"
 ENV ENV="prod"
 
-# Streamlit 애플리케이션 코드 복사
 COPY streamlit_app.py .
 COPY input_gspread.py .
+COPY .config /app/.config
 
 # 데이터베이스 파일 복사
 COPY db /app/db
