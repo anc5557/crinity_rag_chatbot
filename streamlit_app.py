@@ -37,7 +37,7 @@ elif ENV == "prod":
 faiss_index_path = "db"
 embedding_model_name = "jhgan/ko-sroberta-multitask"
 huggingface_llm_model_name = "beomi/gemma-ko-2b"  # beomi/gemma-ko-2b
-ollama_llm_model_name = "llama3.1:8b-instruct-q4_K_M"  # llama-3-Korean-Bllossom-8B-gguf-Q4_K_M or EEVE-Korean-10.8B-Q5_K_M-GGUF or EEVE-Korean-Instruct-10.8B-v1.0-GGUF-Q4-K-M or llama3.1:8b-instruct-q4_K_M
+ollama_llm_model_name = "llama3.1:8b-instruct-q5_K_M"  # llama-3-Korean-Bllossom-8B-gguf-Q4_K_M or EEVE-Korean-10.8B-Q5_K_M-GGUF or EEVE-Korean-Instruct-10.8B-v1.0-GGUF-Q4-K-M or llama3.1:8b-instruct-q4_K_M
 
 
 @st.cache_resource
