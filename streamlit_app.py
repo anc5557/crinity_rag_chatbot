@@ -30,7 +30,7 @@ LLM_TYPE = "Ollama"  # "HuggingFace" 또는 "Ollama"
 
 # Ollama URL 설정
 if ENV == "dev":
-    OLLAMA_BASE_URL = "http://localhost:11434"
+    OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL")
 elif ENV == "prod":
     OLLAMA_BASE_URL = "http://ollama:11434"
 
@@ -292,7 +292,7 @@ def main():
 
             # 질문과 답변을 스프레드시트에 기록
             if ENV == "prod":
-                input_faq(prompt, full_response.strip())
+                input_faq(prompt, full_response.strip(), cleaned_datas)
 
 
 main()

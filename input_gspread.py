@@ -1,16 +1,11 @@
 import time
 import gspread
 
-_credentials_filename = "./.config/gspread/beholder_credentials.json"
-_authorized_user_filename = "./.config/gspread/authorized_user.json"
+_service_account_filename = "./.config/gspread/beholder_service_account.json"
 
 
-def input_faq(question: str, answer: str):
-    # gs = gspread.oauth()
-    gs = gspread.oauth(
-        credentials_filename=_credentials_filename,
-        authorized_user_filename=_authorized_user_filename,
-    )
+def input_faq(question: str, answer: str, context: list):
+    gs = gspread.service_account(filename=_service_account_filename)
 
     # FAQ_FeedBack 문서
     document = gs.open_by_key("1iu9H_OZPtnvGGXM07axeCWz8sH5eSSOpi84nrzMX5B0")
@@ -29,14 +24,23 @@ def input_faq(question: str, answer: str):
     update_start_cell = f"A{row_num}"
     print(update_start_cell)
 
+    str_context = list_to_string_with_index(context)
+
     # input 할 데이터
     input_list = []
     input_data = []
     input_data.append(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time())))
     input_data.append(question)
     input_data.append(answer)
+    input_data.append(str_context)
     input_list.append(input_data)
     print(input_data)
 
     # 시트 업데이트
     worksheet.update(range_name=update_start_cell, values=input_list)
+
+
+def list_to_string_with_index(context):
+    # 리스트의 각 요소를 문자열로 변환하고 인덱스를 추가
+    result = "".join([f"문서 {i+1}: {str(data)} \n" for i, data in enumerate(context)])
+    return result
