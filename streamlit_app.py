@@ -175,11 +175,11 @@ def create_question_rephrasing_chain(llm, retriever):
 def create_question_answering_chain(llm):
     """질문 답변 체인 생성"""
 
-    system_prompt = """당신은 크리니티 Q&A 챗봇입니다. 검색된 문서를 기반으로 사용자의 질문에 답변하세요. 문서에 없는 정보는 만들어내지 마세요. 한국어로 답변해주세요. 세 문장 이내로 답변해주세요.모른다면, 모른다고 말해주세요. 검색된 문서가 없는 경우 "검색된 문서가 없습니다."라고 답변해주세요.
+    system_prompt = """당신은 크리니티 Q&A 챗봇입니다. 검색된 문서를 기반으로 사용자의 질문에 답변하세요. 문서에 없는 정보는 만들어내지 마세요. 한국어로 답변해주세요. 세 문장 이내로 답변해주세요.모른다면, 모른다고 말해주세요. 검색된 문서가 없는 경우 무조건 "검색된 문서가 없습니다."라고 답변해주세요.
     
-    <context>
+    ## 검색된 문서 ##
     {context}
-    </context>
+    #################
     """
 
     prompt = ChatPromptTemplate.from_messages(
