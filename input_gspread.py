@@ -42,5 +42,7 @@ def input_faq(question: str, answer: str, context: list):
 
 def list_to_string_with_index(context):
     # 리스트의 각 요소를 문자열로 변환하고 인덱스를 추가
-    result = "".join([f"문서 {i+1}: {str(data)} \n" for i, data in enumerate(context)])
+    result = "".join(
+        [f"문서 {i+1}\n{data['page_content']}\n\n" for i, data in enumerate(context)]
+    )
     return result

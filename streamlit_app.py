@@ -95,7 +95,7 @@ def create_rag_chain(embedding_model_name, faiss_index_path, llm_model_name, llm
 
     retriever = vectorstore.as_retriever(
         search_type="similarity_score_threshold",
-        search_kwargs={"score_threshold": 0.5, "k": 3},
+        search_kwargs={"score_threshold": 0.4, "k": 3},
         verbose=True,
     )
     question_rephrasing_chain = create_question_rephrasing_chain(llm, retriever)
