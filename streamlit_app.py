@@ -94,8 +94,8 @@ def create_rag_chain(embedding_model_name, faiss_index_path, llm_model_name, llm
     logging.info("LLM 로드 완료")
 
     retriever = vectorstore.as_retriever(
-        search_type="similarity_score_threshold",
-        search_kwargs={"score_threshold": 0.4, "k": 3},
+        search_type="similarity",
+        search_kwargs={"k": 3},
         verbose=True,
     )
     question_rephrasing_chain = create_question_rephrasing_chain(llm, retriever)
