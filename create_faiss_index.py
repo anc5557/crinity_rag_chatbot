@@ -5,13 +5,15 @@ from langchain_community.vectorstores import FAISS
 from langchain_huggingface import HuggingFaceEmbeddings
 
 
-def combine_title_description(data):
+def combine_title_details(data):
     combined_docs = []
-    for manual in data:
-        for item in manual["manual"]:
-            combined_docs.append(
-                {"title": item["title"], "description": item["description"]}
-            )
+    for section in data["manual"]["sections"]:
+        title = section["title"]
+        for detail in section["details"]:
+            subtitle = detail.get("subtitle", "")
+            description = detail.get("description", "")
+            full_text = f"{title}-{subtitle}\n{description}"
+            combined_docs.append(full_text)
     return combined_docs
 
 
@@ -19,14 +21,13 @@ def create_faiss_index(json_path, output_path="db/"):
     with open(json_path, "r", encoding="utf-8") as file:
         data = json.load(file)
 
-    documents = combine_title_description(data)
+    documents = combine_title_details(data)
 
     embedding_model = HuggingFaceEmbeddings(
         model_name="jhgan/ko-sroberta-multitask",
         encode_kwargs={"normalize_embeddings": True},
     )
-    texts = [doc["title"] + " " + doc["description"] for doc in documents]
-    document_objects = [Document(page_content=text) for text in texts]
+    document_objects = [Document(page_content=text) for text in documents]
 
     vectorstore = FAISS.from_documents(
         documents=document_objects, embedding=embedding_model
