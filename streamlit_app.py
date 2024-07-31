@@ -217,6 +217,11 @@ def reset_chat():
 
 
 def main():
+    st.set_page_config(
+        page_title="크리니티 Q&A 챗봇",
+        page_icon="🤖",
+    )
+
     st.title("💭크리니티 Q&A 챗봇")
 
     with st.expander("알림", icon="📢", expanded=True):
