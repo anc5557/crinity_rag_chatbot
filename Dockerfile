@@ -7,6 +7,10 @@ WORKDIR /app
 # Python 가상환경 생성
 RUN python -m venv /app/venv
 
+# tzdata 설치 및 시간대 설정
+RUN apt-get update && apt-get install -y tzdata && \
+  ln -snf /usr/share/zoneinfo/Asia/Seoul /etc/localtime && echo "Asia/Seoul" > /etc/timezone
+
 # 가상환경 활성화 및 패키지 설치
 COPY requirements.txt .
 RUN /app/venv/bin/pip install --upgrade pip && \
