@@ -24,7 +24,8 @@ def create_faiss_index(json_path, output_path="db/"):
     documents = combine_title_details(data)
 
     embedding_model = HuggingFaceEmbeddings(
-        model_name="jhgan/ko-sroberta-multitask",
+        model_name="BAAI/bge-m3",  # "jhgan/ko-sroberta-multitask"
+        model_kwargs={"device": "cuda"},
         encode_kwargs={"normalize_embeddings": True},
     )
     document_objects = [Document(page_content=text) for text in documents]

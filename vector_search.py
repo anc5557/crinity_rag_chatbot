@@ -12,13 +12,15 @@ logging.basicConfig(level=logging.INFO)
 load_dotenv()
 
 faiss_index_path = "db"
-embedding_model_name = "jhgan/ko-sroberta-multitask"
+embedding_model_name = "BAAI/bge-m3"  # "jhgan/ko-sroberta-multitask"
 
 
 def load_embedding_model(model_name):
     """임베딩 모델 로드"""
     embedding_model = HuggingFaceEmbeddings(
-        model_name=model_name, encode_kwargs={"normalize_embeddings": True}
+        model_name=model_name,
+        model_kwargs={"device": "cuda"},
+        encode_kwargs={"normalize_embeddings": True},
     )
     return embedding_model
 
@@ -40,27 +42,24 @@ def main(question):
 
     # 벡터스토어를 이용한 검색 수행
     retriever = vectorstore.as_retriever(
-        # search_type="similarity_score_threshold",
-        # search_kwargs={"score_threshold": 0.5, "k": 3},
-        search_type="similarity",
-        search_kwargs={"k": 3},
+        search_type="mmr",
+        search_kwargs={"k": 2, "fetch_k": 20},
         verbose=True,
     )
 
-    search_results = retriever.get_relevant_documents(question)
+    search_results = retriever.invoke(question)
 
     # 검색된 결과 출력
     if search_results:
-        for i, result in enumerate(search_results):
+        for i, (document) in enumerate(search_results):
             print(f"결과 {i+1}:")
-            print(result.page_content)
+            print(f"{document.page_content}")
+            # print(f"점수: {score}")
             print("-" * 80)
     else:
         print("검색된 문서가 없습니다.")
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Vector search using FAISS.")
-    parser.add_argument("question", type=str, help="The question to ask")
-    args = parser.parse_args()
-    main(args.question)
+    question = "메일 백업하는 방법 알려줘"
+    main(question)

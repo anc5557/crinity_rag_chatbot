@@ -16,6 +16,9 @@ from langchain_core.prompts import (
     FewShotPromptTemplate,
 )
 from langchain.chains.combine_documents import create_stuff_documents_chain
+from langchain.retrievers import ContextualCompressionRetriever
+from langchain.retrievers.document_compressors import CrossEncoderReranker
+from langchain_community.cross_encoders import HuggingFaceCrossEncoder
 
 # 로깅 설정
 logging.basicConfig(level=logging.INFO)
@@ -35,9 +38,10 @@ elif ENV == "prod":
     OLLAMA_BASE_URL = "http://ollama:11434"
 
 faiss_index_path = "db"
-embedding_model_name = "jhgan/ko-sroberta-multitask"
-huggingface_llm_model_name = "beomi/gemma-ko-2b"  # beomi/gemma-ko-2b
-ollama_llm_model_name = "llama3.1:8b-instruct-q5_K_M"  # llama-3-Korean-Bllossom-8B-gguf-Q4_K_M or EEVE-Korean-10.8B-Q5_K_M-GGUF or EEVE-Korean-Instruct-10.8B-v1.0-GGUF-Q4-K-M or llama3.1:8b-instruct-q4_K_M
+embedding_model_name = "BAAI/bge-m3"
+huggingface_llm_model_name = "beomi/gemma-ko-2b"
+ollama_llm_model_name = "llama3.1:8b-instruct-q5_K_M"
+reranker_model_name = "Dongjin-kr/ko-reranker"
 
 
 @st.cache_resource
@@ -82,28 +86,46 @@ def load_llm(llm_model_name, llm_type):
 
 
 @st.cache_resource
-def create_rag_chain(embedding_model_name, faiss_index_path, llm_model_name, llm_type):
+def create_rag_chain(
+    embedding_model_name,
+    faiss_index_path,
+    llm_model_name,
+    reranker_model_name,
+    llm_type,
+):
     """RAG 체인 생성"""
 
     logging.info("서버 시작합니다.")
+
     embedding_model = load_embedding_model(embedding_model_name)
     logging.info("임베딩 모델 로드 완료")
+
     vectorstore = load_vectorstore(faiss_index_path, embedding_model)
     logging.info("벡터스토어 로드 완료")
+
     llm = load_llm(llm_model_name, llm_type)
     logging.info("LLM 로드 완료")
 
-    retriever = vectorstore.as_retriever(
-        search_type="similarity",
-        search_kwargs={"k": 3},
-        verbose=True,
+    # Hugging Face Cross Encoder Reranker + 벡터스토어 retriever
+
+    model = HuggingFaceCrossEncoder(model_name=reranker_model_name)
+
+    compressor = CrossEncoderReranker(model=model, top_n=3)
+    retriever = ContextualCompressionRetriever(
+        base_compressor=compressor,
+        base_retriever=vectorstore.as_retriever(
+            search_type="similarity", search_kwargs={"k": 10}
+        ),
     )
+    logging.info("Hugging Face Cross Encoder 리랭커 적용 완료")
+
     question_rephrasing_chain = create_question_rephrasing_chain(llm, retriever)
     question_answering_chain = create_question_answering_chain(llm)
     rag_chain = create_retrieval_chain(
         question_rephrasing_chain, question_answering_chain
     )
     logging.info("RAG 체인 생성 완료")
+
     return rag_chain
 
 
@@ -175,7 +197,7 @@ def create_question_rephrasing_chain(llm, retriever):
 def create_question_answering_chain(llm):
     """질문 답변 체인 생성"""
 
-    system_prompt = """당신은 크리니티 Q&A 챗봇입니다. 검색된 문서를 기반으로 사용자의 질문에 답변하세요. 문서에 없는 정보는 만들어내지 마세요. 한국어로 답변해주세요. 세 문장 이내로 답변해주세요.모른다면, 모른다고 말해주세요. 검색된 문서가 없는 경우 무조건 "검색된 문서가 없습니다."라고 답변해주세요.
+    system_prompt = """당신은 크리니티 Q&A 챗봇입니다. 검색된 문서를 기반으로 사용자의 질문에 답변하세요. 문서에 없는 정보는 만들어내지 마세요. 한국어로 답변해주세요. 모른다면, 모른다고 말해주세요.
     
     ## 검색된 문서 ##
     {context}
@@ -234,7 +256,11 @@ def main():
 
     # RAG 체인 생성
     rag_chain = create_rag_chain(
-        embedding_model_name, faiss_index_path, llm_model_name, LLM_TYPE
+        embedding_model_name,
+        faiss_index_path,
+        llm_model_name,
+        reranker_model_name,
+        LLM_TYPE,
     )
     st.session_state.rag_chain = rag_chain
 
