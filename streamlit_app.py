@@ -29,14 +29,12 @@ load_dotenv()
 # 환경 변수에서 LLM 타입 및 Ollama URL 설정
 ENV = os.getenv("ENV", "dev")
 
-LLM_TYPE = "Ollama"  # "HuggingFace" 또는 "Ollama"
+LLM_TYPE = os.getenv("LLM_TYPE", "Ollama")
+OLLAMA_BASE_URL = (
+    os.getenv("OLLAMA_BASE_URL") if ENV == "dev" else "http://ollama:11434"
+)
 
-# Ollama URL 설정
-if ENV == "dev":
-    OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL")
-elif ENV == "prod":
-    OLLAMA_BASE_URL = "http://ollama:11434"
-
+# 모델 및 인덱스 경로 설정
 faiss_index_path = "db"
 embedding_model_name = "BAAI/bge-m3"
 huggingface_llm_model_name = "beomi/gemma-ko-2b"
@@ -93,23 +91,14 @@ def create_rag_chain(
     reranker_model_name,
     llm_type,
 ):
-    """RAG 체인 생성"""
-
     logging.info("서버 시작합니다.")
 
     embedding_model = load_embedding_model(embedding_model_name)
-    logging.info("임베딩 모델 로드 완료")
-
     vectorstore = load_vectorstore(faiss_index_path, embedding_model)
-    logging.info("벡터스토어 로드 완료")
-
     llm = load_llm(llm_model_name, llm_type)
-    logging.info("LLM 로드 완료")
 
     # Hugging Face Cross Encoder Reranker + 벡터스토어 retriever
-
     model = HuggingFaceCrossEncoder(model_name=reranker_model_name)
-
     compressor = CrossEncoderReranker(model=model, top_n=3)
     retriever = ContextualCompressionRetriever(
         base_compressor=compressor,
@@ -117,8 +106,8 @@ def create_rag_chain(
             search_type="similarity", search_kwargs={"k": 10}
         ),
     )
-    logging.info("Hugging Face Cross Encoder 리랭커 적용 완료")
 
+    logging.info("Hugging Face Cross Encoder 리랭커 적용 완료")
     question_rephrasing_chain = create_question_rephrasing_chain(llm, retriever)
     question_answering_chain = create_question_answering_chain(llm)
     rag_chain = create_retrieval_chain(

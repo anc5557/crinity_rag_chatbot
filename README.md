@@ -5,11 +5,11 @@
 
 ## Ollama
 
-<https://huggingface.co/teddylee777/EEVE-Korean-Instruct-10.8B-v1.0-gguf>
+<https://ollama.com/library/llama3.1:8b-instruct-q5_K_M>
 
 ollama 모델을 사용하였습니다.  
 위 링크에서 모델을 다운로드 받아  
-터미널에서 "ollama create <모델이름> -f <Modelfile 경로>"를 실행하여 모델을 생성합니다.  
+터미널에서 "ollama pull llama3.1:8b-instruct-q5_K_M으로 모델을 다운로드 받습니다.
 
 ## Requirements
 
@@ -42,3 +42,7 @@ streamlit run streamlit_app.py 명령어로 실행합니다.
 ## .env
 
 메뉴얼 문서와 스프레드 시트 API를 사용하기 위한 환경 변수 파일은 비공개로 관리합니다.
+
+## 모델 사용
+
+[Dongjin-kr/ko-reranker](https://huggingface.co/Dongjin-kr/ko-reranker) reranker 모델을 사용하였습니다.  
