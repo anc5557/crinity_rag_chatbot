@@ -1,8 +1,9 @@
 import json
 import argparse
+import os
 from langchain_core.documents import Document
 from langchain_community.vectorstores import FAISS
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_ollama import OllamaEmbeddings
 
 
 def combine_title_details(data):
@@ -23,11 +24,12 @@ def create_faiss_index(json_path, output_path="db/"):
 
     documents = combine_title_details(data)
 
-    embedding_model = HuggingFaceEmbeddings(
-        model_name="BAAI/bge-m3",  # "jhgan/ko-sroberta-multitask"
-        model_kwargs={"device": "cuda"},
-        encode_kwargs={"normalize_embeddings": True},
+    ENV = os.getenv("ENV", "dev")
+    OLLAMA_BASE_URL = (
+        os.getenv("OLLAMA_BASE_URL") if ENV == "dev" else "http://ollama:11434"
     )
+
+    embedding_model = OllamaEmbeddings(model="bge-m3", base_url=OLLAMA_BASE_URL)
     document_objects = [Document(page_content=text) for text in documents]
 
     vectorstore = FAISS.from_documents(
