@@ -28,6 +28,7 @@ class Initializer:
         """임베딩 모델을 초기화합니다."""
         return OllamaEmbeddings(
             model=self.embedding_model_name,
+            base_url=self.ollama_base_url,
         )
 
     def initialize_vectorstore(self, embedding_model):

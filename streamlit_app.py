@@ -3,7 +3,7 @@ import time
 import streamlit as st
 import logging
 from dotenv import load_dotenv
-from input_gspread import input_faq
+from utils.input_gspread import input_faq
 
 from initializer import Initializer
 from agents.translation_agent import TranslationAgent
