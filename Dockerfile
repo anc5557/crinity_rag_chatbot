@@ -19,13 +19,10 @@ ENV PATH="/app/venv/bin:$PATH"
 ENV ENV="prod"
 
 # 필요한 파일 및 디렉토리 복사
-COPY streamlit_app.py .
-COPY input_gspread.py .
 COPY .config /app/.config
 COPY db /app/db
 COPY agents /app/agents
 COPY common /app/common
-COPY data /app/data
 COPY pages /app/pages
 COPY utils /app/utils
 COPY Home.py .
