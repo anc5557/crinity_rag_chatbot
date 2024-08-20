@@ -25,6 +25,9 @@ class TaskType(str, Enum):
     SUMMARIZE = "Summary"
     ManualQA = "Inquiry"
     GREETING = "Greeting"
+    PROOFREAD = "Proofread"
+    TITLERECOMMENDATION = "TitleRecommendation"
+    EMAILTEMPLATE = "EmailTemplate"
     ETC = "Others"
 
 

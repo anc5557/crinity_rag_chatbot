@@ -14,6 +14,7 @@ class Router:
     - 요약(Summary)
     - 문의(Inquiry)
     - 인사(Greeting)
+    - 맞춤법&문맥(Proofread)
     - 기타(Others)
     """
 
@@ -23,12 +24,14 @@ class Router:
         translation_agent,
         summarization_agent,
         qa_agent,
+        email_assistant_agent,
         general_task_agent,
     ):
         self.llm = llm
         self.translation_agent = translation_agent
         self.summarization_agent = summarization_agent
         self.qa_agent = qa_agent
+        self.email_assistant_agent = email_assistant_agent
         self.general_task_agent = general_task_agent
 
     def route(self, input):
@@ -40,6 +43,9 @@ class Router:
         - Translation: Converting text from one language to another.
         - Summary: Summarizing long text into shorter form.
         - Inquiry: Answering questions or providing information about emails.
+        - Proofread: Checking spelling, grammar, and context issues in the email content.
+        - TitleRecommendation : Suggesting a title based on the email content.
+        - EmailTemplate: Generating email templates for different purposes.
         - Greeting: Greetings or introductions.
         - Others: Tasks that do not fall into the above categories.
         </Task Types>
@@ -54,12 +60,18 @@ class Router:
         - 메일 실패 문의에 대해 답변드립니다. 해당 문제는 SMTP 전송 실패로 인한 문제입니다. 이 글을 영어로 번역해주세요. // Translation
         - 현대 사회에서는 기술의 발전이 눈부시게 빠르게 이루어지고 있습니다. 이러한 기술 발전은 우리의 일상 생활에 많은 변화를 가져왔습니다. 이 글을 요약해줘 // Summary
         - 기술 발전이 가져오는 긍정적인 면만 있는 것은 아닙니다. 기술의 빠른 발전으로 인해 많은 직업이 자동화되고 있으며, 이에 따라 일자리의 감소와 같은 사회적 문제가 발생하고 있습니다. 또한, 개인정보 보호와 같은 문제도 대두되고 있습니다. 요약해줘. // Summary 
+        - 이메일의 맞춤법을 검사해줘 // Proofread
+        - 이 이메일의 문법이 맞는지 확인해줘 // Proofread
+        - 이 이메일의 제목을 추천해줘 // TitleRecommendation
+        - 이 내용에 맞는 적절한 이메일 제목을 추천해줘 // TitleRecommendation
+        - 이 내용을 바탕으로 이메일 템플릿을 생성해줘 // EmailTemplate
+        - 이 내용을 이메일 템플릿으로 만들어줘 // EmailTemplate
         </Examples>
         
         <Format>
         ```json
         {
-            "task_type": "Translation" | "Summary" | "Inquiry" | "Greeting" | "Others"
+            "task_type": "Translation" | "Summary" | "Inquiry" | "Proofread" | "EmailTemplate" | "Greeting" | "Others"
         }
         ```
         Json format with the key: `task_type`.
@@ -98,6 +110,12 @@ class Router:
             return self.summarization_agent.summarize(input)
         elif task_type == TaskType.ManualQA:
             return self.qa_agent.answer_question(input, chat_history)
+        elif task_type == TaskType.PROOFREAD:
+            return self.email_assistant_agent.proofread(input)
+        elif task_type == TaskType.TITLERECOMMENDATION:
+            return self.email_assistant_agent.suggest_title(input)
+        elif task_type == TaskType.EMAILTEMPLATE:
+            return self.email_assistant_agent.generate_simple_email_template(input)
         elif task_type == TaskType.GREETING:
             return self.general_task_agent.greet(input)
         else:
