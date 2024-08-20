@@ -38,4 +38,4 @@ COPY README.md .
 EXPOSE 8501
 
 # Streamlit 애플리케이션 실행 명령어
-CMD ["Home", "run", "Home.py", "--server.port=8501", "--server.address=0.0.0.0"]
+CMD ["streamlit", "run", "Home.py", "--server.port=8501", "--server.address=0.0.0.0"]
