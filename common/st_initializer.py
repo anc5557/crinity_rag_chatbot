@@ -7,6 +7,7 @@ from agents.manual_qa_agent import ManualQaAgent
 from agents.general_task_agent import GeneralTaskAgent
 from agents.email_assistant_agent import EmailAssistantAgent
 from router import Router
+import streamlit as st
 
 load_dotenv()
 
@@ -16,7 +17,8 @@ OLLAMA_BASE_URL = (
 )
 
 
-def initialize_router():
+@st.cache_resource
+def initialize():
     initializer = Initializer(
         embedding_model_name="bge-m3",
         index_path="db",
@@ -36,3 +38,18 @@ def initialize_router():
         llm_json, translation, summarization, qa, email_assistant, general_task
     )
     return translation, summarization, qa, email_assistant, general_task, router
+
+
+def initialize_session_state():
+    if "agents" not in st.session_state:
+        translation, summarization, qa, email_assistant, general_task, router = (
+            initialize()
+        )
+        st.session_state.agents = {
+            "translation": translation,
+            "summarization": summarization,
+            "qa": qa,
+            "email_assistant": email_assistant,
+            "general_task": general_task,
+            "router": router,
+        }

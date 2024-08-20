@@ -79,9 +79,6 @@ class TranslationAgent:
         chain = chat_prompt | self.llm | StrOutputParser()
         translated_text = chain.invoke({"input": input})
 
-        response = f"""
-        알겠습니다. 번역 결과는 다음과 같습니다.\n
-        {translated_text}
-        """
+        response = translated_text
 
         return response
