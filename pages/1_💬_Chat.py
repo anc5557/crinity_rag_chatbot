@@ -12,8 +12,6 @@ st.set_page_config(
 
 initialize_session_state()
 
-ENV = os.getenv("ENV", "dev")
-
 
 def reset_chat():
     st.session_state.messages = []
@@ -84,7 +82,7 @@ if input := st.chat_input("Ask a question!"):
         )
 
         # 질문과 답변을 스프레드시트에 기록
-        if ENV == "prod":
-            if "cleaned_datas" not in locals():
-                cleaned_datas = []
-            input_faq(input, full_response.strip(), cleaned_datas)
+
+        if "cleaned_datas" not in locals():
+            cleaned_datas = []
+        input_faq(input, full_response.strip(), cleaned_datas, "챗봇")

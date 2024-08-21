@@ -1,5 +1,6 @@
 import streamlit as st
 from common.st_initializer import initialize_session_state
+from utils.input_gspread import input_faq
 
 st.set_page_config(page_title="크리니티 AI - 메일 템플릿", page_icon="✉️")
 
@@ -31,3 +32,12 @@ if st.button("생성", use_container_width=True):
         # 결과를 박스에 표현
         st.markdown("### ✉️ 메일 템플릿")
         st.markdown(response)
+
+        # # 피드백
+        # input_faq(
+        #     input_text,
+        #     response,
+        #     [],
+        #     "메일 템플릿",
+        #     "수신 대상: {}, 어투: {}, 상황: {}".format(target, tone, category),
+        # )

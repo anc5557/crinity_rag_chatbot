@@ -1,5 +1,6 @@
 import streamlit as st
 from common.st_initializer import initialize_session_state
+from utils.input_gspread import input_faq
 
 st.set_page_config(
     page_title="크리니티 AI - 번역",
@@ -30,3 +31,12 @@ if st.button("번역", use_container_width=True):
         # 결과를 박스에 표현
         st.markdown("### 🌏 번역 결과")
         st.markdown(translated_text)
+
+        # # 피드백
+        # input_faq(
+        #     input_text,
+        #     translated_text,
+        #     [],
+        #     "번역",
+        #     f"{source_language} -> {target_language}",
+        # )

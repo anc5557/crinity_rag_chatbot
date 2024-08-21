@@ -1,17 +1,22 @@
 import time
 import gspread
+import os
 
 _service_account_filename = "./.config/gspread/beholder_service_account.json"
 
+ENV = os.getenv("ENV", "dev")
 
-def input_faq(question: str, answer: str, context: list):
+
+def input_faq(question: str, answer: str, context: list, category: str, etc=""):
     gs = gspread.service_account(filename=_service_account_filename)
 
     # FAQ_FeedBack 문서
     document = gs.open_by_key("1iu9H_OZPtnvGGXM07axeCWz8sH5eSSOpi84nrzMX5B0")
 
     # FeedBack 시트
-    worksheet = document.worksheet("feedback")
+    worksheet = (
+        document.worksheet("feedback") if ENV == "prod" else document.worksheet("test")
+    )
 
     # 시트 전체 데이터 가져오기
     # list_of_lists = worksheet.get(return_type=GridRangeType.ListOfLists)
@@ -26,6 +31,9 @@ def input_faq(question: str, answer: str, context: list):
 
     str_context = list_to_string_with_index(context)
 
+    if not str_context:
+        str_context = " "
+
     # input 할 데이터
     input_list = []
     input_data = []
@@ -33,7 +41,10 @@ def input_faq(question: str, answer: str, context: list):
     input_data.append(question)
     input_data.append(answer)
     input_data.append(str_context)
+    input_data.append(category)
+    input_data.append(etc)
     input_list.append(input_data)
+
     print(input_data)
 
     # 시트 업데이트

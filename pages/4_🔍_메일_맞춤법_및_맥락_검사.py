@@ -1,5 +1,6 @@
 import streamlit as st
 from common.st_initializer import initialize_session_state
+from utils.input_gspread import input_faq
 
 st.set_page_config(
     page_title="크리니티 AI - 메일 맞춤법 및 맥락 검사",
@@ -7,7 +8,6 @@ st.set_page_config(
 )
 
 initialize_session_state()
-
 st.title("🔍 메일 맞춤법 및 맥락 검사")
 
 # 이메일 내용 입력
@@ -23,3 +23,11 @@ if st.button("검사", use_container_width=True):
         # 결과를 박스에 표현
         st.markdown("### 📝 검사 결과")
         st.markdown(response)
+
+        # # 피드백
+        # input_faq(
+        #     input_text,
+        #     response,
+        #     [],
+        #     "메일 맞춤법 및 맥락 검사",
+        # )
