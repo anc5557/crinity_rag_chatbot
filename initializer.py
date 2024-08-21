@@ -3,6 +3,7 @@ from langchain_community.vectorstores import FAISS
 from langchain_ollama import ChatOllama
 from langchain.retrievers.document_compressors import CrossEncoderReranker
 from langchain_community.cross_encoders import HuggingFaceCrossEncoder
+from langchain.retrievers import ContextualCompressionRetriever
 
 
 class Initializer:
@@ -63,9 +64,14 @@ class Initializer:
 
     def initialize_retriever(self, vectorstore):
         """리트리버를 초기화합니다."""
-        return vectorstore.as_retriever(
-            search_type="similarity", search_kwargs={"k": 3}
+        reranker = self.initialize_reranker()
+        return ContextualCompressionRetriever(
+            base_compressor=reranker,
+            base_retriever=vectorstore.as_retriever(
+                search_type="similarity", search_kwargs={"k": 10}
+            ),
         )
+        # return vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 10})
 
     def initialize(self):
         """모든 도구를 초기화하여 반환합니다."""
@@ -74,5 +80,4 @@ class Initializer:
         retriever = self.initialize_retriever(vectorstore)
         llm = self.initialize_chat_ollama()
         llm_json = self.initialize_chat_ollama_json()
-        # reranker = self.initialize_reranker()
         return llm, llm_json, retriever
