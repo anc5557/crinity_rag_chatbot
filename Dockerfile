@@ -31,6 +31,15 @@ COPY models.py .
 COPY router.py .
 COPY README.md .
 
+# ollama 폴더 복사
+COPY ollama /app/ollama
+
+# ollama 폴더 내의 파일을 /app/venv/python3.10/langchain_ollama 폴더에 복사하여 덮어쓰기
+RUN cp /app/ollama/chat_models.py /app/venv/python3.10/langchain_ollama/ && \
+  cp /app/ollama/embeddings.py /app/venv/python3.10/langchain_ollama/ && \
+  cp /app/ollama/llms.py /app/venv/python3.10/langchain_ollama/
+
+
 # Streamlit이 실행되는 포트 노출
 EXPOSE 8501
 
