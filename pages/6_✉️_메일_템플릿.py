@@ -33,11 +33,11 @@ if st.button("생성", use_container_width=True):
         st.markdown("### ✉️ 메일 템플릿")
         st.markdown(response)
 
-        # # 피드백
-        # input_faq(
-        #     input_text,
-        #     response,
-        #     [],
-        #     "메일 템플릿",
-        #     "수신 대상: {}, 어투: {}, 상황: {}".format(target, tone, category),
-        # )
+        # 피드백
+        input_faq(
+            input_text,
+            response,
+            [],
+            "메일 템플릿",
+            "수신 대상: {}, 어투: {}, 상황: {}".format(target, tone, category),
+        )

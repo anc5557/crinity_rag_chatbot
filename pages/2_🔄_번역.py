@@ -32,11 +32,11 @@ if st.button("번역", use_container_width=True):
         st.markdown("### 🌏 번역 결과")
         st.markdown(translated_text)
 
-        # # 피드백
-        # input_faq(
-        #     input_text,
-        #     translated_text,
-        #     [],
-        #     "번역",
-        #     f"{source_language} -> {target_language}",
-        # )
+        # 피드백
+        input_faq(
+            input_text,
+            translated_text,
+            [],
+            "번역",
+            f"{source_language} -> {target_language}",
+        )

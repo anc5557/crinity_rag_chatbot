@@ -24,10 +24,10 @@ if st.button("생성", use_container_width=True):
         st.markdown("### 💡 이메일 제목")
         st.markdown(response)
 
-        # # 피드백
-        # input_faq(
-        #     input_text,
-        #     response,
-        #     [],
-        #     "이메일 제목 생성",
-        # )
+        # 피드백
+        input_faq(
+            input_text,
+            response,
+            [],
+            "이메일 제목 생성",
+        )

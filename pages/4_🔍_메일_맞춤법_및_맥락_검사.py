@@ -24,10 +24,10 @@ if st.button("검사", use_container_width=True):
         st.markdown("### 📝 검사 결과")
         st.markdown(response)
 
-        # # 피드백
-        # input_faq(
-        #     input_text,
-        #     response,
-        #     [],
-        #     "메일 맞춤법 및 맥락 검사",
-        # )
+        # 피드백
+        input_faq(
+            input_text,
+            response,
+            [],
+            "메일 맞춤법 및 맥락 검사",
+        )
