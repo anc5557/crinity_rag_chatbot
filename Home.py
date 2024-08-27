@@ -10,6 +10,7 @@ initialize_session_state()
 
 st.write("# 환영합니다! 크리니티 AI입니다.")
 st.markdown("사이드바에서 원하는 기능을 선택하여 사용해 주세요.")
+st.markdown("기능 개선을 위해 요청에 대한 데이터를 수집하고 있습니다.")
 st.markdown(
     "피드백은 언제나 환영입니다. [여기](https://docs.google.com/spreadsheets/d/1iu9H_OZPtnvGGXM07axeCWz8sH5eSSOpi84nrzMX5B0/edit?pli=1&gid=1303851737#gid=1303851737)를 클릭하여 피드백을 남겨주세요."
 )

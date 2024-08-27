@@ -21,7 +21,7 @@ st.title("💭크리니티 Q&A 챗봇")
 
 with st.expander("알림", icon="📢", expanded=True):
     st.markdown(
-        "사내 테스트 중입니다. 문서는 cm9.3 사용자 메뉴얼입니다. \n\n  답변이 만족스럽지 않다면, [여기](https://docs.google.com/spreadsheets/d/1iu9H_OZPtnvGGXM07axeCWz8sH5eSSOpi84nrzMX5B0/edit?pli=1&gid=0#gid=0)를 클릭하여 '상이함'에 체크해주세요."
+        "사내 테스트 중입니다. \n\n메뉴얼에 대한 문의를 제외한 질문은 이전 대화를 기억하지 못합니다. 추후 업데이트 예정입니다. \n\n  답변이 만족스럽지 않다면, [여기](https://docs.google.com/spreadsheets/d/1iu9H_OZPtnvGGXM07axeCWz8sH5eSSOpi84nrzMX5B0/edit?pli=1&gid=0#gid=0)를 클릭하여 '상이함'에 체크해주세요."
     )
 
 if "messages" not in st.session_state:
