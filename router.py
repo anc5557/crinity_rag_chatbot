@@ -42,7 +42,7 @@ class Router:
         <Task Types>
         - Translation: Converting text from one language to another.
         - Summary: Summarizing long text into shorter form.
-        - Inquiry: Answering questions or providing information about emails.
+        - Inquiry: Answering questions or providing information related to email functions, settings, login processes, web folders, calendars, or other related features. This includes how to perform specific tasks, troubleshooting, or general inquiries about these functions.
         - Proofread: Checking spelling, grammar, and context issues in the email content.
         - TitleRecommendation : Suggesting a title based on the email content.
         - EmailTemplate: Generating email templates for different purposes.
@@ -62,9 +62,10 @@ class Router:
         - 기술 발전이 가져오는 긍정적인 면만 있는 것은 아닙니다. 기술의 빠른 발전으로 인해 많은 직업이 자동화되고 있으며, 이에 따라 일자리의 감소와 같은 사회적 문제가 발생하고 있습니다. 또한, 개인정보 보호와 같은 문제도 대두되고 있습니다. 요약해줘. // Summary 
         - 이메일의 맞춤법을 검사해줘 // Proofread
         - 이 이메일의 문법이 맞는지 확인해줘 // Proofread
+        - The club captain found the net in the 25th minute against Everton at Tottenham Hotspur Stadium in London when his team was leading 1-0. 이게 무슨 말이야? // Translation
         - 이 이메일의 제목을 추천해줘 // TitleRecommendation
         - 이 내용에 맞는 적절한 이메일 제목을 추천해줘 // TitleRecommendation
-        - 이 내용을 바탕으로 이메일 템플릿을 생성해줘 // EmailTemplate
+        - 이 내용을 바탕으로 이메일을 작성해줘 // EmailTemplate
         - 이 내용을 이메일 템플릿으로 만들어줘 // EmailTemplate
         </Examples>
         

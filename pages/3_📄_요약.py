@@ -24,10 +24,10 @@ if st.button("요약", use_container_width=True):
         st.markdown("### 📄 요약 결과")
         st.markdown(summarized_text)
 
-        # # 피드백
-        # input_faq(
-        #     input_text,
-        #     summarized_text,
-        #     [],
-        #     "요약",
-        # )
+        # 피드백
+        input_faq(
+            input_text,
+            summarized_text,
+            [],
+            "요약",
+        )

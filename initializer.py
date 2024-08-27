@@ -1,9 +1,8 @@
-# from langchain_ollama import OllamaEmbeddings
-from langchain_community.embeddings import OllamaEmbeddings
-from langchain_community.chat_models import ChatOllama
 from langchain_community.vectorstores import FAISS
 
-# from langchain_ollama import ChatOllama
+# from langchain_ollama import ChatOllama, OllamaEmbeddings
+from langchain_community.chat_models import ChatOllama
+from langchain_community.embeddings import OllamaEmbeddings
 from langchain.retrievers.document_compressors import CrossEncoderReranker
 from langchain_community.cross_encoders import HuggingFaceCrossEncoder
 from langchain.retrievers import ContextualCompressionRetriever
