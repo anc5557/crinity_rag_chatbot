@@ -7,29 +7,23 @@ WORKDIR /app
 # Python 가상환경 생성
 RUN python -m venv /app/venv
 
+# 타임존 설정
 ENV TZ=Asia/Seoul
 
-# 가상환경 활성화 및 패키지 설치
-COPY requirements.txt . 
+# torch와 faiss-gpu 먼저 설치
 RUN /app/venv/bin/pip install --upgrade pip && \
-  /app/venv/bin/pip install -r requirements.txt
+  /app/venv/bin/pip install torch==2.3.1 faiss-gpu
+
+# Python 가상환경 활성화 및 패키지 설치
+COPY server_requirements.txt .
+RUN /app/venv/bin/pip install --default-timeout=100 -r server_requirements.txt
 
 # 환경 변수 설정
 ENV PATH="/app/venv/bin:$PATH"
 ENV ENV="prod"
 
 # 필요한 파일 및 디렉토리 복사
-COPY .config /app/.config
-COPY db /app/db
-COPY agents /app/agents
-COPY common /app/common
-COPY pages /app/pages
-COPY utils /app/utils
-COPY Home.py .
-COPY initializer.py .
-COPY models.py .
-COPY router.py .
-COPY README.md .
+COPY . /app/
 
 # Streamlit이 실행되는 포트 노출
 EXPOSE 8501
