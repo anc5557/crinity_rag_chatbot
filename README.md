@@ -8,16 +8,15 @@
 <https://ollama.com/library/llama3.1:8b-instruct-q5_K_M>
 
 ollama 모델을 사용하였습니다.  
-위 링크에서 모델을 다운로드 받아  
 터미널에서 "ollama pull llama3.1:8b-instruct-q5_K_M으로 모델을 다운로드 받습니다.
 
 ## Requirements
 
 streamlit==1.36.0  
-langchain==0.2.11  
-langchain-community==0.2.10  
+langchain==0.2.14  
+langchain-community==0.2.12  
 langchain_huggingface==0.0.3  
-torch==2.4.0  
+torch==2.3.1  
 faiss-gpu  
 python-dotenv  
 gspread  
@@ -34,10 +33,10 @@ gspread
 
 cuda가 사용 가능한지 확인하는 코드입니다.
 
-## streamlit_app.py
+## Home.py
 
 streamlit을 사용하여 챗봇을 실행하는 코드입니다.  
-streamlit run streamlit_app.py 명령어로 실행합니다.
+streamlit run Home.py 명령어로 실행합니다.
 
 ## .env
 
